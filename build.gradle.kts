@@ -5,10 +5,10 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.ktfmt)
+    `maven-publish`
 }
 
 group = "com.runicrealms.menus"
-
 version = "0.1.0"
 
 repositories {
@@ -44,4 +44,27 @@ tasks.withType<KtfmtCheckTask>().configureEach {
     source = project.fileTree(rootDir)
     include("**/*.kt")
     exclude("**/generated/**")
+}
+
+val archiveName = "menus"
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            groupId = project.group.toString()
+            artifactId = archiveName
+            version = project.version.toString()
+        }
+    }
+    repositories {
+        maven {
+            name = "nexus"
+            url = uri("https://nexus.runicrealms.com/repository/maven-releases/")
+            credentials {
+                username = System.getenv("NEXUS_USERNAME")
+                password = System.getenv("NEXUS_PASSWORD")
+            }
+        }
+    }
 }
